@@ -73,6 +73,8 @@ typedef NavigationDecision NavigationDelegate(NavigationRequest navigation);
 /// Signature for when a [WebView] has finished loading a page.
 typedef void PageFinishedCallback(String url);
 
+typedef void ContentHeightChangedCallback(int contentHeight);
+
 final RegExp _validChannelNames = RegExp('^[a-zA-Z_][a-zA-Z0-9]*\$');
 
 /// A named channel for receiving messaged from JavaScript code running inside a web view.
@@ -121,6 +123,7 @@ class WebView extends StatefulWidget {
     this.navigationDelegate,
     this.gestureRecognizers,
     this.onPageFinished,
+    this.onContentHeightChanged,
     this.debuggingEnabled = false,
   })  : assert(javascriptMode != null),
         super(key: key);
@@ -242,6 +245,8 @@ class WebView extends StatefulWidget {
   /// directly in the HTML has been loaded and code injected with
   /// [WebViewController.evaluateJavascript] can assume this.
   final PageFinishedCallback onPageFinished;
+
+  final ContentHeightChangedCallBack onContentHeightChanged;
 
   /// Controls whether WebView debugging is enabled.
   ///
@@ -437,6 +442,12 @@ class WebViewController {
       case 'onPageFinished':
         if (_widget.onPageFinished != null) {
           _widget.onPageFinished(call.arguments['url']);
+        }
+
+        return null;
+      case 'onContentHeightChanged':
+        if (_widget.onPageFinished != null) {
+          _widget.onContentHeightChanged(call.arguments['contentHeight']);
         }
 
         return null;

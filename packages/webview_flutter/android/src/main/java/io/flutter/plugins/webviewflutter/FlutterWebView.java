@@ -9,6 +9,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.view.View;
+import android.util.Log;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -19,25 +20,26 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.platform.PlatformView;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FlutterWebView implements PlatformView, MethodCallHandler {
+public class FlutterWebView implements PlatformView, MethodCallHandler, ContentHeightListener {
   private static final String JS_CHANNEL_NAMES_FIELD = "javascriptChannelNames";
-  private final WebView webView;
+  private final MyWebView webView;
   private final MethodChannel methodChannel;
   private final FlutterWebViewClient flutterWebViewClient;
   private final Handler platformThreadHandler;
 
   @SuppressWarnings("unchecked")
   FlutterWebView(Context context, BinaryMessenger messenger, int id, Map<String, Object> params) {
-    webView = new WebView(context);
+    webView = new MyWebView(context);
     platformThreadHandler = new Handler(context.getMainLooper());
     // Allow local storage.
     webView.getSettings().setDomStorageEnabled(true);
-
     methodChannel = new MethodChannel(messenger, "plugins.flutter.io/webview_" + id);
     methodChannel.setMethodCallHandler(this);
+    webView.setContentHeigthListener(this);
 
     flutterWebViewClient = new FlutterWebViewClient(methodChannel);
     applySettings((Map<String, Object>) params.get("settings"));
@@ -99,6 +101,13 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
       default:
         result.notImplemented();
     }
+  }
+
+  @Override
+  public void onContentHeightUpdated(int height) {
+    Map<String, Object> args = new HashMap<>();
+    args.put("contentHeight", height);
+    methodChannel.invokeMethod("onContentHeightChanged", args);
   }
 
   @SuppressWarnings("unchecked")
@@ -202,11 +211,6 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
 
           webView.setWebViewClient(webViewClient);
           break;
-        case "debuggingEnabled":
-          final boolean debuggingEnabled = (boolean) settings.get(key);
-
-          webView.setWebContentsDebuggingEnabled(debuggingEnabled);
-          break;
         default:
           throw new IllegalArgumentException("Unknown WebView setting: " + key);
       }
@@ -238,3 +242,4 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
     methodChannel.setMethodCallHandler(null);
   }
 }
+
