@@ -26,14 +26,14 @@ import java.util.Map;
 
 public class FlutterWebView implements PlatformView, MethodCallHandler, ContentHeightListener {
   private static final String JS_CHANNEL_NAMES_FIELD = "javascriptChannelNames";
-  private final MyWebView webView;
+  private final CallbackWebView webView;
   private final MethodChannel methodChannel;
   private final FlutterWebViewClient flutterWebViewClient;
   private final Handler platformThreadHandler;
 
   @SuppressWarnings("unchecked")
   FlutterWebView(Context context, BinaryMessenger messenger, int id, Map<String, Object> params) {
-    webView = new MyWebView(context);
+    webView = new CallbackWebView(context);
     platformThreadHandler = new Handler(context.getMainLooper());
     // Allow local storage.
     webView.getSettings().setDomStorageEnabled(true);
@@ -210,6 +210,11 @@ public class FlutterWebView implements PlatformView, MethodCallHandler, ContentH
               flutterWebViewClient.createWebViewClient(hasNavigationDelegate);
 
           webView.setWebViewClient(webViewClient);
+          break;
+        case "debuggingEnabled":
+          final boolean debuggingEnabled = (boolean) settings.get(key);
+
+          webView.setWebContentsDebuggingEnabled(debuggingEnabled);
           break;
         default:
           throw new IllegalArgumentException("Unknown WebView setting: " + key);

@@ -7,18 +7,19 @@ import android.util.Log;
 
 
 
-public class MyWebView extends WebView {
+public class CallbackWebView extends WebView {
     private ContentHeightListener listener;
+    int contentHeight = getContentHeight();
 
-    public MyWebView(Context context) {
+    public CallbackWebView(Context context) {
         super(context);
     }
 
-    public MyWebView(Context context, AttributeSet attrs) {
+    public CallbackWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public MyWebView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CallbackWebView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -29,7 +30,10 @@ public class MyWebView extends WebView {
     @Override
     public void invalidate() {
         super.invalidate();
-        if (getContentHeight() > 0) {
+        // Scrolling in the webview will trigger invalidate. 
+        // To prevent unnecessary updates we check if the contentheight has changed before triggering the onContentHeightUpdated callback
+        if (getContentHeight() != contentHeight) {
+            contentHeight = getContentHeight();
             if(listener!=null)
                 listener.onContentHeightUpdated(getContentHeight());
         }

@@ -73,6 +73,7 @@ typedef NavigationDecision NavigationDelegate(NavigationRequest navigation);
 /// Signature for when a [WebView] has finished loading a page.
 typedef void PageFinishedCallback(String url);
 
+// Signature for when a WebView contentheight has changed
 typedef void ContentHeightChangedCallback(int contentHeight);
 
 final RegExp _validChannelNames = RegExp('^[a-zA-Z_][a-zA-Z0-9]*\$');
@@ -246,7 +247,7 @@ class WebView extends StatefulWidget {
   /// [WebViewController.evaluateJavascript] can assume this.
   final PageFinishedCallback onPageFinished;
 
-  final ContentHeightChangedCallBack onContentHeightChanged;
+  final ContentHeightChangedCallback onContentHeightChanged;
 
   /// Controls whether WebView debugging is enabled.
   ///
@@ -446,7 +447,7 @@ class WebViewController {
 
         return null;
       case 'onContentHeightChanged':
-        if (_widget.onPageFinished != null) {
+        if (_widget.onContentHeightChanged != null) {
           _widget.onContentHeightChanged(call.arguments['contentHeight']);
         }
 
