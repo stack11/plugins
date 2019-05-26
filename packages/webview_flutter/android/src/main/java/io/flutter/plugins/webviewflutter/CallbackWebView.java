@@ -5,10 +5,8 @@ import android.util.AttributeSet;
 import android.webkit.WebView;
 import android.util.Log;
 
-
-
 public class CallbackWebView extends WebView {
-    private ContentHeightListener listener;
+    private ContentHeightListener contentHeightListener;
     int contentHeight = getContentHeight();
 
     public CallbackWebView(Context context) {
@@ -24,19 +22,24 @@ public class CallbackWebView extends WebView {
     }
 
     public void setContentHeigthListener(ContentHeightListener listener) {
-        this.listener = listener;
+        this.contentHeightListener = listener;
     }
 
     @Override
     public void invalidate() {
         super.invalidate();
-        // Scrolling in the webview will trigger invalidate. 
-        // To prevent unnecessary updates we check if the contentheight has changed before triggering the onContentHeightUpdated callback
-        if (getContentHeight() != contentHeight) {
-            contentHeight = getContentHeight();
-            if(listener!=null)
-                listener.onContentHeightUpdated(getContentHeight());
+        // Scrolling in the webview will trigger invalidate.
+        // To prevent unnecessary updates we check if the contentheight has changed
+        // before triggering the onContentHeightUpdated callback
+        final int newContentHeight = getContentHeight();
+        Log.d(
+            "FlutterWebView",
+            "Invalidate call, height is now " + String.valueOf(newContentHeight));
+        if (newContentHeight != contentHeight) {
+            contentHeight = newContentHeight;
+            if (contentHeightListener != null) {
+                contentHeightListener.onContentHeightUpdated(newContentHeight);
+            }
         }
     }
 }
-

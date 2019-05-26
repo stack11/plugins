@@ -105,6 +105,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler, ContentH
 
   @Override
   public void onContentHeightUpdated(int height) {
+    Log.d(
+        "FlutterWebView",
+        "Height has been updated to " + String.valueOf(height));
     Map<String, Object> args = new HashMap<>();
     args.put("contentHeight", height);
     methodChannel.invokeMethod("onContentHeightChanged", args);
