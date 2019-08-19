@@ -346,7 +346,7 @@
   return true;
 }
 
-(bool)loadData:(NSDictionary<NSString*, id>*)request {
+- (bool)loadData:(NSDictionary<NSString*, id>*)request {
   if (!request) {
     return false;
   }
