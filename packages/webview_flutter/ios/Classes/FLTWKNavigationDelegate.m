@@ -29,6 +29,12 @@
     decisionHandler(WKNavigationActionPolicyAllow);
     return;
   }
+
+  if (navigationAction.navigationType != WKNavigationTypeLinkActivated) {
+    decisionHandler(WKNavigationActionPolicyAllow);
+    return;
+  }
+
   NSDictionary* arguments = @{
     @"url" : navigationAction.request.URL.absoluteString,
     @"isForMainFrame" : @(navigationAction.targetFrame.isMainFrame)
